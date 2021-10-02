@@ -4,16 +4,20 @@ const helmet = require("helmet"); // securise Express apps en configurant les he
 const path = require("path"); // gestion des répertoires et chemins de fichiers
 const rateLimit = require("express-rate-limit"); // protection contre les attaques en force brute
 require("dotenv").config(); // variables d'environnement chargées à partir du fichier .env
-const database = require("./config");
+const database = require("./models");
 
 // const sauceRoutes = require("./routes/sauce"); // import des routes pour sauces
 const userRoutes = require("./routes/user"); // import des routes pour users
 
-// vérifier la connexion à la BDD
-database.connect(function (err) {
-	if (err) throw err;
-	console.log("Successfully connected to database");
-});
+// Synchronisation de la base de données
+database.sequelize
+	.sync()
+	.then(() => {
+		console.log("database sync'ed");
+	})
+	.catch((error) => {
+		throw error;
+	});
 
 // Framework Express
 const app = express();

@@ -1,74 +1,72 @@
 // in controllers/user.js
 const bcrypt = require("bcrypt"); // module de cryptage SHA1 pour password
 const jwt = require("jsonwebtoken"); // module d'authentification par token
-const database = require("../config");
+const database = require("../models"); // bdd definition
+const User = database.users;
+const { Op } = require("sequelize");
 
 // POST pour signup d'un nouvel utilisateur
 // ========================================
 exports.signup = (req, res, next) => {
-	const user = req.body;
 	console.log("signup");
 
-	bcrypt.hash(user.password, 10).then((hash) => {
-		// Enregistrement des données de l'utilisateur
-		user.password = hash;
-		user.isadmin = 0;
+	bcrypt
+		.hash(req.body.password, 10) // password hashé
+		.then((hash) => {
+			const user = new User({
+				name: req.body.name,
+				email: req.body.email,
+				password: hash,
+			});
+			user
+				.save() // Tentative de sauvegarde en base
 
-		database.query('SELECT * from users WHERE name="' + user.name + '" OR email="' + user.email + '"', (err, result) => {
-			// On vérifie si le name ou l'email existent déjà
-			if (err) throw err;
+				// Sauvegarde OK
+				.then((user) => {
+					if (user) {
+						res.status(201).json({ message: "User created !" });
+					}
+				})
 
-			if (result.length >= 1) {
-				// si oui, on abandonne
-				return res.status(400).json({ message: "User already exists !" });
-			} else {
-				// Si non, on enregistre
-				database.query("INSERT INTO users SET ?", user, (error, result) => {
-					if (error) throw error;
-					return res.status(201).json({ message: "User created !" });
-				});
-			}
-		});
-	});
+				// Erreur 400 Bad Request: Erreur de validation si user existe
+				.catch((error) => res.status(400).json({ error }));
+		})
+		.catch((error) => res.status(500).json({ error }));
 };
 
 // POST pour login d'un utilisateur
 // ================================
 exports.login = (req, res, next) => {
-	const user = req.body;
-
 	console.log("login");
-	database.query('SELECT password, id FROM users WHERE email="' + user.email + '"', (err, result) => {
-		if (!err) {
-			if (!result) {
-				// le user n'exite pas dans la base
-				return res.status(401).json({ message: "User not found !" });
-			} else {
-				// le user existe, verifions le password
-				console.log(user.password);
-				console.log(result[0].password);
 
-				bcrypt
-					.compare(user.password, result[0].password)
-
-					.then((valid) => {
-						if (!valid) {
-							// l'utilisateur existe mais le password ne correspond pas
-							return res.status(500).json({ message: "L'utilisateur et le mot de passe ne correspondent pas" });
-						}
-						res.status(200).json({
-							// l'utilisateur existe et le password est le bon
-							token: jwt.sign({ userId: result[0].id }, process.env.TOKEN, { expiresIn: "24h" }),
-							userId: result[0].id,
-						});
-					})
-					// Erreur de comparaison bcrypt.compare
-					.catch((error) => res.status(500).json({ error }));
+	User.findOne({
+		where: {
+			email: req.body.email,
+		},
+	})
+		.then((user) => {
+			if (!user) {
+				// l'utilisateur n'existe pas
+				return res.status(404).json({ message: "Invalid credential !" });
 			}
-		} else {
-			throw err;
-		}
-	});
+			bcrypt // L'utilisateur existe, on vérifie que le password est le bon
+				.compare(req.body.password, user.password)
+				.then((valid) => {
+					if (!valid) {
+						// l'utilisateur existe mais le password ne correspond pas
+						return res.status(401).json({ message: "Invalid credential !" });
+					}
+					res.status(200).json({
+						// l'utilisateur existe et le password est le bon
+						userId: user.id,
+						role: user.isAdmin,
+						name: user.name,
+						token: jwt.sign({ userId: user.id }, process.env.TOKEN, { expiresIn: "24h" }),
+					});
+				}) // Erreur bcrypt.compare
+				.catch((error) => res.status(500).json({ error }));
+		}) // Erreur findOne
+		.catch((error) => res.status(500).json({ error }));
 };
 
 // GET info un User
@@ -76,21 +74,33 @@ exports.login = (req, res, next) => {
 exports.getUser = (req, res, next) => {
 	console.log("getUser");
 
-	database.query('SELECT * FROM users WHERE id="' + req.params.id + '"', (err, result) => {
-		if (err) throw err;
-		console.log(result);
-		return res.status(200).json(result);
-	});
+	User.findOne({ where: { id: req.params.id } })
+		.then((user) => {
+			res.status(200).json(user);
+		})
+		.catch((error) => res.status(404).json({ error }));
 };
 
 // GET info All Users
 // ==================
 exports.getAllUsers = (req, res, next) => {
-	console.log("getAllUsers");
-
-	database.query("SELECT * FROM users", (err, result) => {
-		if (err) throw err;
-		console.log(result);
-		return res.status(200).json(result);
-	});
+	User.findAll({
+		where: { id: { [Op.gt]: 0 } },
+	})
+		.then((AllUserdata) => {
+			res.status(200).json({ AllUserdata });
+		})
+		.catch((error) => {
+			res.status(400).json({ error });
+		});
 };
+
+// DELETE one User
+// ===============
+exports.deleteUser = (req, res, next) => {
+	console.log(req.query);
+};
+
+// DELETE my Account
+// =================
+exports.deleteMyAccount = (req, res, next) => {};
