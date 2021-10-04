@@ -12,7 +12,7 @@ router.post("/login", validate.user, userCtrl.login);
 // Déclaration des routes user, avec authentification
 router.get("/:id", auth, userCtrl.getUser);
 router.get("/", auth, userCtrl.getAllUsers);
-router.delete("/", auth, userCtrl.deleteUser);
-router.delete("/:id", auth, userCtrl.deleteMyAccount);
+router.delete("/", auth, userCtrl.deleteMyAccount);
+router.delete("/:id", auth, validate.id, userCtrl.deleteUser);
 
 module.exports = router;

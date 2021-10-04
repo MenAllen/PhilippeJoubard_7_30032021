@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 // Authentification des requêtes par le token reçu
 // ===============================================
 module.exports = (req, res, next) => {
+	console.log("auth");
 	try {
 		const token = req.headers.authorization.split(" ")[1]; // extraction de token depuis "Bearer xxxxxx"
 		const decodedToken = jwt.verify(token, process.env.TOKEN); // décodage du token par jsonwebtoken

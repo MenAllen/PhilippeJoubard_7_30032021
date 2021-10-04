@@ -1,9 +1,8 @@
-// in controllers/user.js
+// La gestion des utilisateurs
 const bcrypt = require("bcrypt"); // module de cryptage SHA1 pour password
 const jwt = require("jsonwebtoken"); // module d'authentification par token
-const database = require("../models"); // bdd definition
-const User = database.users;
-const { Op } = require("sequelize");
+const db = require("../models"); // bdd definition
+const User = db.users;
 
 // POST pour signup d'un nouvel utilisateur
 // ========================================
@@ -59,7 +58,8 @@ exports.login = (req, res, next) => {
 					res.status(200).json({
 						// l'utilisateur existe et le password est le bon
 						userId: user.id,
-						role: user.isAdmin,
+						admin: user.isAdmin,
+						email: user.email,
 						name: user.name,
 						token: jwt.sign({ userId: user.id }, process.env.TOKEN, { expiresIn: "24h" }),
 					});
@@ -84,9 +84,7 @@ exports.getUser = (req, res, next) => {
 // GET info All Users
 // ==================
 exports.getAllUsers = (req, res, next) => {
-	User.findAll({
-		where: { id: { [Op.gt]: 0 } },
-	})
+	User.findAll()
 		.then((AllUserdata) => {
 			res.status(200).json({ AllUserdata });
 		})
@@ -95,12 +93,40 @@ exports.getAllUsers = (req, res, next) => {
 		});
 };
 
+// DELETE My Account
+// =================
+exports.deleteMyAccount = (req, res, next) => {
+	console.log("deleteMyAccount");
+	console.log(req.user);
+
+	User.destroy({ where: { id: req.user } })
+		.then(() => res.status(200).json({ message: "user with Id=" + req.user + " deleted" }))
+		.catch((error) => {
+			console.log(error);
+			res.status(401).json({ message: "delete failed !" });
+		});
+};
+
 // DELETE one User
 // ===============
 exports.deleteUser = (req, res, next) => {
-	console.log(req.query);
-};
+	console.log("deleteUser");
 
-// DELETE my Account
-// =================
-exports.deleteMyAccount = (req, res, next) => {};
+	const paramId = parseInt(req.params.id);
+
+	User.findOne({ where: { id: req.user } })
+		.then((user) => {
+			if (user.isAdmin && user.id != paramId) {
+				// le demandeur est Admin et différent du user à supprimer
+				User.destroy({ where: { id: paramId } })
+					.then(() => res.status(200).json({ message: "user with Id=" + paramId + " deleted" }))
+					.catch((error) => {
+						console.log(error);
+						res.status(401).json({ message: "delete failed !" });
+					});
+			}
+			// le demandeur n'est pas admin ou veut se supprimer
+			else res.status(401).json({ message: "Unauthorized request !" });
+		})
+		.catch((error) => res.status(404).json({ error }));
+};

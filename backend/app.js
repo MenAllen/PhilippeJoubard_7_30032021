@@ -6,8 +6,9 @@ const rateLimit = require("express-rate-limit"); // protection contre les attaqu
 require("dotenv").config(); // variables d'environnement chargées à partir du fichier .env
 const database = require("./models");
 
-// const sauceRoutes = require("./routes/sauce"); // import des routes pour sauces
 const userRoutes = require("./routes/user"); // import des routes pour users
+const messageRoutes = require("./routes/message"); // import des routes pour messages
+const commentRoutes = require("./routes/comment"); // import des routes pour comments
 
 // Synchronisation de la base de données
 database.sequelize
@@ -53,7 +54,8 @@ app.use(limiter);
 app.use("/images", express.static(path.join(__dirname, "images")));
 
 // routes de l'API
-//app.use("/api/sauces", sauceRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/message", messageRoutes);
+app.use("/api/comment", commentRoutes);
 
 module.exports = app;
