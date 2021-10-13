@@ -12,7 +12,7 @@
 								<label for="floatingInput">Email address</label>
 							</div>
 							<div class="form-floating mb-3">
-								<input type="password" v-model="password" class="form-control" id="floatingPassword" placeholder="Password" />
+								<input type="password" v-model="password" class="form-control" id="floatingPassword" placeholder="Password" autocomplete="off" />
 								<label for="floatingPassword">Password</label>
 							</div>
 
@@ -56,17 +56,17 @@ export default {
 				method: "POST",
 				body: JSON.stringify({ email: this.email, password: this.password }),
 			})
-				.then((response) => {
-					console.log(response);
-					localStorage.setItem("token", response.data.token);
-					localStorage.setItem("userId", response.data.userId);
-					localStorage.setItem("username", response.data.username);
-					localStorage.setItem("isAdmin", response.data.isAdmin);
-					localStorage.setItem("imageProfile", response.data.imageProfile);
-				})
-				.catch(function (error) {
-					console.log(error);
-				});
+				.then(response => response.json())
+				.then((data) => {
+					console.log(data);
+					localStorage.setItem("token", data.token);
+					localStorage.setItem("userId", data.userId);
+					localStorage.setItem("username", data.name);
+					localStorage.setItem("isAdmin", data.isAdmin);
+					this.$router.push({ path: "/message" });
+					}
+				)
+				.catch((error) => console.log(error))
 		},
 	},
 };

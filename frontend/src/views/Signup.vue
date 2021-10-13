@@ -16,7 +16,7 @@
 								<label for="floatingInput2">Email address</label>
 							</div>
 							<div class="form-floating mb-3">
-								<input type="password" v-model="password" class="form-control" id="floatingPassword" placeholder="Password" />
+								<input type="password" v-model="password" class="form-control" id="floatingPassword" placeholder="Password" autocomplete="off" />
 								<label for="floatingPassword">Password</label>
 							</div>
 
@@ -63,6 +63,7 @@ export default {
 			})
 				.then((response) => {
 					console.log(response);
+					this.$router.push({ path: "/login" });
 				})
 				.catch(function (error) {
 					console.log(error);

@@ -10,9 +10,11 @@ exports.createComment = (req, res, next) => {
 
 	const comment = new Comment({
 		UserId: req.user,
-		MessageId: req.body.messageId,
-		comment: req.body.comment,
+		MessageId: req.params.id,
+		comment: req.body.content,
 	});
+
+	console.log(req.body);
 
 	comment
 		.save()
@@ -25,12 +27,15 @@ exports.createComment = (req, res, next) => {
 exports.getAllComments = (req, res, next) => {
 	console.log("getAllComments");
 
-	console.log(req.body.messageId);
-
 	Comment.findAll({
 		where: {
-			MessageId: req.body.messageId,
+			MessageId: req.params.id,
 		},
+		order: [['createdAt' ]] ,
+		include: [{
+				model: User,
+				attributes: [ 'name' ]
+		}],
 	})
 		.then((listComment) => res.status(200).json(listComment))
 		.catch((error) => res.status(404).json({ error }));

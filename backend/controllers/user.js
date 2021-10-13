@@ -13,7 +13,7 @@ exports.signup = (req, res, next) => {
 		.hash(req.body.password, 10) // password hashé
 		.then((hash) => {
 			const user = new User({
-				name: req.body.name,
+				name: req.body.username,
 				email: req.body.email,
 				password: hash,
 			});
@@ -120,12 +120,34 @@ exports.deleteUser = (req, res, next) => {
 				// le demandeur est Admin et différent du user à supprimer
 				User.destroy({ where: { id: paramId } })
 					.then(() => res.status(200).json({ message: "user with Id=" + paramId + " deleted" }))
-					.catch((error) => {
-						console.log(error);
+					.catch(() => {
 						res.status(401).json({ message: "delete failed !" });
 					});
 			}
 			// le demandeur n'est pas admin ou veut se supprimer
+			else res.status(401).json({ message: "Unauthorized request !" });
+		})
+		.catch((error) => res.status(404).json({ error }));
+};
+
+// Admin User
+// ==========
+exports.adminUser = (req, res, next) => {
+	console.log("adminUser");
+
+	const paramId = parseInt(req.params.id);
+
+	User.findOne({ where: { id: req.user } })
+		.then((user) => {
+			if (user.isAdmin && user.id != paramId) {
+				// le demandeur est Admin et différent du user à supprimer, on update
+				User.update({ isAdmin: req.body.isadmin }, { where: { id: paramId } })
+					.then(() => res.status(200).json({ message: "User with Id=" + paramId + " updated" }))
+					.catch(() => {
+						res.status(401).json({ message: "Update failed !" });
+					});
+			}
+			// le demandeur n'est pas admin
 			else res.status(401).json({ message: "Unauthorized request !" });
 		})
 		.catch((error) => res.status(404).json({ error }));

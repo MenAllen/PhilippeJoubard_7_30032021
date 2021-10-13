@@ -15,17 +15,14 @@
 
 		<div class="collapse navbar-collapse" id="navbarSupportedContent">
 			<ul class="navbar-nav mr-auto">
-				<li class="nav-item active">
-					<a class="nav-link" href="#"><Button label="Accueil"></Button><span class="sr-only">(current)</span></a>
-				</li>
 				<li class="nav-item">
 					<a class="nav-link" href="#"
-						><router-link to="/login"><Button label="Se connecter"></Button></router-link
+						><router-link to="/profile"><Button label="Mon Profil"></Button></router-link
 					></a>
 				</li>
 				<li class="nav-item">
 					<a class="nav-link" href="#"
-						><router-link to="/signup"><Button label="S'inscrire"></Button></router-link
+						><router-link to="/"><Button label="Se déconnecter"></Button></router-link
 					></a>
 				</li>
 			</ul>

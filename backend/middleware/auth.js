@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 // ===============================================
 module.exports = (req, res, next) => {
 	console.log("auth");
+	console.log(req.headers.authorization);
 	try {
 		const token = req.headers.authorization.split(" ")[1]; // extraction de token depuis "Bearer xxxxxx"
 		const decodedToken = jwt.verify(token, process.env.TOKEN); // décodage du token par jsonwebtoken
@@ -20,6 +21,7 @@ module.exports = (req, res, next) => {
 			next();
 		}
 	} catch {
+		console.log("Unauthorized Request");
 		res.status(403).json({ message: "Unauthorized request" });
 	}
 };

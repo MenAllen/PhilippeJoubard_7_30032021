@@ -10,6 +10,7 @@ exports.createMessage = (req, res, next) => {
 	console.log("createMessage");
 
 	console.log(req.user);
+	console.log(req.body.content);
 
 	let picture = "";
 	if (req.file) {
@@ -17,7 +18,7 @@ exports.createMessage = (req, res, next) => {
 	}
 	const message = new Message({
 		UserId: req.user,
-		message: req.body.message,
+		message: req.body.content,
 		imageUrl: picture,
 	});
 
@@ -32,9 +33,16 @@ exports.createMessage = (req, res, next) => {
 exports.getAllMessages = (req, res, next) => {
 	console.log("getAllMessages");
 
-	Message.findAll()
-		.then((messages) => {
-			res.status(200).json({ messages });
+	Message.findAll({
+		order: [['createdAt', 'DESC' ]] ,
+		include: [{
+				model: User,
+				attributes: [ 'name' ]
+		}],
+
+	})
+		.then((results) => {
+			res.status(200).json({ results });
 		})
 		.catch((error) => res.status(400).json({ error }));
 };
@@ -72,13 +80,9 @@ exports.deleteMessage = (req, res, next) => {
 	console.log(req.user);
 	console.log(paramId);
 
-	if (req.user === paramId) {
-		Message.destroy({ where: { UserId: req.params.id } })
-			.then(() => {
-				res.status(200).json({ message: "Message(s) deleted" });
-			})
-			.catch((error) => res.status(400).json({ error }));
-	} else {
-		res.status(401).json({ message: "Unauthorized request" });
-	}
+	Message.destroy({ where: { id: req.params.id } })
+		.then(() => {
+			res.status(200).json({ message: "Message(s) deleted" });
+		})
+		.catch((error) => res.status(400).json({ error }));
 };
