@@ -16,7 +16,7 @@
 
                                 <div class="card-body w-100">
                                     <h5 class="card-title">Votre message</h5>
-                                    <Textarea v-model="content" :autoResize="true" class="form-control" rows="4"/>
+                                    <Textarea v-model="content" :autoResize="true" class="form-control" rows="4" minlength="5" required />
                                     <div id="preview" style="display:block">
                                         <img v-if="imagePreview" :src="imagePreview" id="preview" style="display:block" class="uploadImage" alt="Image Prévisualisée"/>
                                     </div>         
@@ -111,10 +111,10 @@
                             </div>
                         </div>
 
-                        <form @submit.prevent="createComment(result.id)" aria-label="Nouveau message"> 
+                        <form @submit.prevent="createComment(result.id)" aria-label="Nouveau commentaire"> 
 
                             <div class="card-body w-80">
-                                <Textarea v-model="newComment" :autoResize="true" class="form-control m-2" rows="3" placeholder="Votre commentaire"/>
+                                <Textarea v-model="newComment" :autoResize="true" class="form-control m-2" rows="3" placeholder="Votre commentaire" minlength="5" required />
                                 <div id="preview" style="display:block">
                                     <img v-if="imagePreview" :src="imagePreview" id="preview" style="display:block"  alt="Prévisualisation de l'image ajoutée au message"/>
                                 </div>

@@ -8,11 +8,11 @@
 						<h5 class="card-title text-center mb-5 fw-light fs-5">Se connecter</h5>
 						<form @submit.prevent="login">
 							<div class="form-floating mb-3">
-								<input type="email" v-model="email" class="form-control" id="floatingInput" placeholder="name@example.com" />
+								<input type="email" v-model="email" minlength="3" class="form-control" id="floatingInput" placeholder="name@example.com" required />
 								<label for="floatingInput">Email address</label>
 							</div>
 							<div class="form-floating mb-3">
-								<input type="password" v-model="password" class="form-control" id="floatingPassword" placeholder="Password" autocomplete="off" />
+								<input type="password" v-model="password" minlength="8" class="form-control" id="floatingPassword" placeholder="Password" autocomplete="off" required />
 								<label for="floatingPassword">Password</label>
 							</div>
 

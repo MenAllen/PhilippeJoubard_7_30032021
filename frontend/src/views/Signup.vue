@@ -8,15 +8,15 @@
 						<h5 class="card-title text-center mb-5 fw-light fs-5">S'inscrire</h5>
 						<form @submit.prevent="signup">
 							<div class="form-floating mb-3">
-								<input type="text" v-model="username" class="form-control" id="floatingInput1" placeholder="Username" />
+								<input type="text" v-model="username" minlength="1" class="form-control" id="floatingInput1" placeholder="Username" required />
 								<label for="floatingInput1">Username</label>
 							</div>
 							<div class="form-floating mb-3">
-								<input type="email" v-model="email" class="form-control" id="floatingInput2" placeholder="name@example.com" />
+								<input type="email" v-model="email" class="form-control" id="floatingInput2" placeholder="name@example.com" required />
 								<label for="floatingInput2">Email address</label>
 							</div>
 							<div class="form-floating mb-3">
-								<input type="password" v-model="password" class="form-control" id="floatingPassword" placeholder="Password" autocomplete="off" />
+								<input type="password" v-model="password" minlength="8" class="form-control" id="floatingPassword" placeholder="Password" autocomplete="off" required />
 								<label for="floatingPassword">Password</label>
 							</div>
 

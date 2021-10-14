@@ -61,7 +61,7 @@ exports.login = (req, res, next) => {
 						isAdmin: user.isAdmin,
 						email: user.email,
 						name: user.name,
-						token: jwt.sign({ userId: user.id }, process.env.TOKEN, { expiresIn: "24h" }),
+						token: jwt.sign({ userId: user.id }, process.env.TOKEN, { expiresIn: "30d" }),
 					});
 				}) // Erreur bcrypt.compare
 				.catch((error) => res.status(500).json({ error }));
