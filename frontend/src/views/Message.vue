@@ -63,8 +63,6 @@
                                 </button>
                                 <div class="dropdown-menu dropdown-scale dropdown-menu-right" role="menu" style="position: absolute; transform: translate3d(-136px, 28px, 0px); top: 0px; left: 0px; will-change: transform;">
                                     <a v-if="userId == result.UserId || isAdmin == 'true'" v-on:click="deleteMsg(result.id)" class="dropdown-item">Supprimer le message</a>
-                                    <a class="dropdown-item" href="#">Stop following</a>
-                                    <a class="dropdown-item" href="#">Report</a>
                                 </div>
                             </div><!--/ dropdown -->
                             <div class="media m-0">
@@ -100,6 +98,15 @@
                                         <span><i class="icon ion-md-pin">{{ comment.User.name }}</i></span>
                                         <span><i class="icon ion-md-time mx-2">{{ formatDateTime(result.createdAt) }}</i></span>
                                     </div>
+                                    <div class="dropdown float-right">
+                                        <button class="btn btn-flat btn-flat-icon" type="button" data-toggle="dropdown" aria-expanded="false">
+                                            <em class="fa fa-ellipsis-h"></em>
+                                        </button>
+                                        <div class="dropdown-menu dropdown-scale dropdown-menu-right" role="menu" style="position: absolute; transform: translate3d(-136px, 28px, 0px); top: 0px; left: 0px; will-change: transform;">
+                                            <a v-if="userId == result.UserId || isAdmin == 'true'" v-on:click="deleteComment(comment.id)" class="dropdown-item">Supprimer le commentaire</a>
+                                        </div>
+                                    </div><!--/ dropdown -->
+
                                 </div><!--/ Commentaires existants -->
                             </div>
                         </div>
@@ -132,137 +139,171 @@
 
 
 <script>  
-    import axios from 'axios'
-    import HeaderMsg from '../components/HeaderMsg.vue'
-    import Textarea from 'primevue/textarea';
-    import moment from 'moment'
+import axios from 'axios'
+import HeaderMsg from '../components/HeaderMsg.vue'
+import Textarea from 'primevue/textarea';
+import moment from 'moment'
+import { Notyf } from "notyf";
+import "notyf/notyf.min.css";
 
-    export default {
-        name: 'Message',
-        components: {
-            HeaderMsg,
-            Textarea,
+export default {
+    name: 'Message',
+    components: {
+        HeaderMsg,
+        Textarea,
+    },
+    data() {
+        return {
+            userId: localStorage.getItem('userId'),
+            name: localStorage.getItem('name'),
+            isAdmin: localStorage.getItem('isAdmin'),
+            results: [],
+            result: '',
+            imageUrl: '',
+            imagePreview: null,
+            content: '',
+            toggleComment: false,
+            comments: [],
+            newComment: '',
+        }
+    },
+
+    created() {
+        this.displayMsg();
+        this.notyf = new Notyf();
+    },
+
+    methods: {
+
+        uploadFile() {
+            this.$refs.fileUpload.click()
         },
-        data() {
-            return {
-                userId: localStorage.getItem('userId'),
-                name: localStorage.getItem('name'),
-                isAdmin: localStorage.getItem('isAdmin'),
-                results: [],
-                result: '',
-                imageUrl: '',
-                imagePreview: null,
-                content: '',
-                toggleComment: false,
-                comments: [],
-                newComment: '',
+
+        onFileSelected(event) {
+            this.imagePost = event.target.files[0];
+            this.imagePreview = URL.createObjectURL(this.imagePost);
+        }, 
+
+        createMsg() {
+            const formData = new FormData();
+            formData.append("content", this.content);
+            formData.append("image", this.imagePost);
+
+            axios.post('http://localhost:3000/api/message', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                }
+            })
+            .then(() => {
+                window.location.reload()
+            })
+            .catch(err => {
+                this.notyf.error("Erreur Create " + err.response.status + " " + err.response.statusText);
+				window.location.reload();
+            })
+        },
+
+        // Permet d'afficher tous les messages
+        displayMsg() {
+            axios.get('http://localhost:3000/api/message', {
+                headers: {
+                    'Content-Type' : 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                }
+            })
+            .then(response => { 
+                this.results= response.data.results;
+                console.log(response.data.results);
+            })
+            .catch(err => {
+                this.notyf.error("Erreur Display " + err.response.status + " " + err.response.statusText);
+				window.location.reload();
+            })
+        },
+
+        // Affiche les commentaires d'un message donné
+        displayComment(id) {
+            this.toggleComment = !this.toggleComment
+               
+            axios.get('http://localhost:3000/api/comment/' + id, {
+                headers: {
+                    'Content-Type' : 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                }
+            })
+            .then(response => {
+                this.comments = response.data;
+            })
+            .catch(err => {
+                this.notyf.error("Erreur Display " + err.response.status + " " + err.response.statusText);
+				window.location.reload();
+            })
+        },
+
+        // Publie un nouveau commentaire
+        createComment(id) {
+
+            axios.post('http://localhost:3000/api/comment/' + id, {
+                content: this.newComment,
+            },{
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                }
+            })
+            .then(() => {
+                window.location.reload()                    
+            })
+            .catch(err => {
+                this.notyf.error("Erreur Create " + err.response.status + " " + err.response.statusText);
+				window.location.reload();
+            })
+        },
+
+        // Formatte la date de publication
+        formatDateTime(dateValue){
+            if (dateValue) {   
+                return moment(String(dateValue)).format('DD/MM/YYYY hh:mm')
             }
         },
 
-        created() {
-            this.displayMsg();
-        },
-
-        methods: {
-
-            uploadFile() {
-                this.$refs.fileUpload.click()
-            },
-
-            onFileSelected(event) {
-                this.imagePost = event.target.files[0];
-                this.imagePreview = URL.createObjectURL(this.imagePost);
-            }, 
-
-            createMsg() {
-                const formData = new FormData();
-                formData.append("content", this.content);
-                formData.append("image", this.imagePost);
-
-                axios.post('http://localhost:3000/api/message', formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                        'Authorization': 'Bearer ' + localStorage.getItem('token')
-                    }
-                })
-                .then(() => {
-                    window.location.reload()
-                })
-                .catch((error) => console.log(error))
-            },
-
-            // Permet d'afficher tous les messages
-            displayMsg() {
-                axios.get('http://localhost:3000/api/message', {
-                    headers: {
-                        'Content-Type' : 'application/json',
-                        'Authorization': 'Bearer ' + localStorage.getItem('token')
-                    }
-                })
-                .then(response => { 
-                    this.results= response.data.results;
-                    console.log(response.data.results);
-                })
-                 .catch((error) => console.log(error))
-            },
-
-            // Affiche les commentaires d'un message donné
-            displayComment(id) {
-                const msgId = id;
-                this.toggleComment = !this.toggleComment
+        // Supprime un message
+        deleteMsg(id) {
                
-                axios.get('http://localhost:3000/api/comment/' + msgId, {
-                    headers: {
-                        'Content-Type' : 'application/json',
-                        'Authorization': 'Bearer ' + localStorage.getItem('token')
-                    }
-                })
-                .then(response => {
-                    this.comments = response.data;
-                })
-                .catch((error) => console.log(error))
-            },
-
-            // Publie un nouveau commentaire
-            createComment(id) {
-                const msgId = id;
-
-                axios.post('http://localhost:3000/api/comment/' + msgId, {
-                    content: this.newComment,
-                },{
-                    headers: {
-                        'Authorization': 'Bearer ' + localStorage.getItem('token')
-                    }
-                })
-                .then(() => {
-                    window.location.reload()                    
-                })
-                .catch((error) => console.log(error))
-            },
-
-            // Formatte la date de publication
-            formatDateTime(dateValue){
-                if (dateValue) {   
-                    return moment(String(dateValue)).format('DD/MM/YYYY hh:mm')
+            axios.delete('http://localhost:3000/api/message/' + id, {
+                headers: {
+                    'Content-Type' : 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
                 }
-            },
-
-            // Supprime un message
-            deleteMsg(id) {
-               
-                axios.delete('http://localhost:3000/api/message/' + id, {
-                    headers: {
-                        'Content-Type' : 'application/json',
-                        'Authorization': 'Bearer ' + localStorage.getItem('token')
-                    }
-                })
-                .then(() => {
-                    this.displayMsg();
-                })
-                .catch((error) => console.log(error))
-            },
+            })
+            .then(() => {
+                this.displayMsg();
+            })
+            .catch(err => {
+                this.notyf.error("Erreur Delete " + err.response.status + " " + err.response.statusText);
+				window.location.reload();
+            })
         },
-    }  
+
+        // Supprime un commentaire
+        deleteComment(id) {
+
+            axios.delete('http://localhost:3000/api/comment/' + id, {
+                headers: {
+                    'Content-Type' : 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                }
+            })
+            .then(() => {
+                window.location.reload()
+            })
+           .catch(err => {
+                this.notyf.error("Erreur Delete " + err.response.status + " " + err.response.statusText);
+				window.location.reload();
+            })
+        },
+    },
+}  
 </script>
 
 

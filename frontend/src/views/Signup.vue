@@ -37,7 +37,10 @@
 </template>
 
 <script>
+import axios from 'axios'
 import Header from "../components/Header.vue";
+import { Notyf } from "notyf";
+import "notyf/notyf.min.css";
 
 export default {
 	name: "Signup",
@@ -51,23 +54,25 @@ export default {
 			password: "",
 		};
 	},
+	created() {
+    this.notyf = new Notyf();
+  },
 	methods: {
 		// Création d'un nouvel user dans la base
-		signup() {
-			fetch("http://localhost:3000/api/user/signup", {
-				headers: {
-					"Content-Type": "application/json",
-				},
-				method: "POST",
-				body: JSON.stringify({ username: this.username, email: this.email, password: this.password }),
-			})
-				.then((response) => {
-					console.log(response);
-					this.$router.push({ path: "/login" });
-				})
-				.catch(function (error) {
-					console.log(error);
-				});
+    signup() {
+      axios.post('http://localhost:3000/api/user/signup', {
+        username: this.username,
+        email: this.email,
+        password: this.password,
+      })
+      .then(() => {
+				this.notyf.success("Utilisateur" + this.username + " créé !");
+				this.$router.push({ path: "/login" });
+      })
+      .catch(err => {
+        this.notyf.error("Erreur Signup " + err.response.status);
+				window.location.reload()
+      })
 		},
 	},
 };

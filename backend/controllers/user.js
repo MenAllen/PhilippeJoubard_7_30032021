@@ -58,7 +58,7 @@ exports.login = (req, res, next) => {
 					res.status(200).json({
 						// l'utilisateur existe et le password est le bon
 						userId: user.id,
-						admin: user.isAdmin,
+						isAdmin: user.isAdmin,
 						email: user.email,
 						name: user.name,
 						token: jwt.sign({ userId: user.id }, process.env.TOKEN, { expiresIn: "24h" }),
@@ -116,8 +116,8 @@ exports.deleteUser = (req, res, next) => {
 
 	User.findOne({ where: { id: req.user } })
 		.then((user) => {
-			if (user.isAdmin && user.id != paramId) {
-				// le demandeur est Admin et différent du user à supprimer
+			if (user.isAdmin || user.id == paramId) {
+				// le demandeur est Admin ou le demandeur se supprime lui-même
 				User.destroy({ where: { id: paramId } })
 					.then(() => res.status(200).json({ message: "user with Id=" + paramId + " deleted" }))
 					.catch(() => {

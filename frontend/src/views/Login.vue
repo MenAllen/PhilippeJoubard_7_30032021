@@ -33,7 +33,11 @@
 </template>
 
 <script>
+import axios from 'axios'
 import Header from "../components/Header.vue";
+import { Notyf } from "notyf";
+import "notyf/notyf.min.css";
+
 
 export default {
 	name: "Home",
@@ -46,27 +50,28 @@ export default {
 			password: "",
 		};
 	},
+  created() {
+    this.notyf = new Notyf();
+  },
 	methods: {
 		// Connection et récupération des infos dans localStorage
 		login() {
-			fetch("http://localhost:3000/api/user/login", {
-				headers: {
-					"Content-Type": "application/json",
-				},
-				method: "POST",
-				body: JSON.stringify({ email: this.email, password: this.password }),
-			})
-				.then(response => response.json())
-				.then((data) => {
-					console.log(data);
-					localStorage.setItem("token", data.token);
-					localStorage.setItem("userId", data.userId);
-					localStorage.setItem("username", data.name);
-					localStorage.setItem("isAdmin", data.isAdmin);
-					this.$router.push({ path: "/message" });
-					}
-				)
-				.catch((error) => console.log(error))
+			axios
+				.post("http://localhost:3000/api/user/login", {
+					email: this.email,
+					password: this.password,
+				})
+				.then((response) => {
+					localStorage.setItem("token", response.data.token);
+					localStorage.setItem("userId", response.data.userId);
+					localStorage.setItem("username", response.data.username);
+					localStorage.setItem("isAdmin", response.data.isAdmin);
+					this.$router.push("message");
+				})
+        .catch(err => {
+          this.notyf.error("Erreur Login " + err.response.status + " " + err.response.statusText);
+					window.location.reload();
+        })
 		},
 	},
 };

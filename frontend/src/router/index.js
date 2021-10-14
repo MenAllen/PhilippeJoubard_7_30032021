@@ -22,6 +22,11 @@ const routes = [
 		name: "Message",
 		component: () => import(/* webpackChunkName: "about" */ "../views/Message.vue"),
 	},
+	{
+		path: "/profil",
+		name: "Profil",
+		component: () => import(/* webpackChunkName: "about" */ "../views/Profil.vue"),
+	},
 ];
 
 const router = createRouter({
