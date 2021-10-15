@@ -71,7 +71,7 @@ export default {
         password: this.password,
       })
       .then(() => {
-				this.notyf.success("Utilisateur " + this.username + " créé !");
+				alert('Votre compte a bien été créé')
 				this.$router.push({ path: "/login" });
       })
       .catch(err => {
