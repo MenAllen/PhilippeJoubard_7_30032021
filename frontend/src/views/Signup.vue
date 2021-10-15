@@ -55,7 +55,12 @@ export default {
 		};
 	},
 	created() {
-    this.notyf = new Notyf();
+		this.notyf = new Notyf({
+			position: {
+				x: 'center',
+				y: 'top'
+			}
+		});
   },
 	methods: {
 		// Création d'un nouvel user dans la base
@@ -66,7 +71,7 @@ export default {
         password: this.password,
       })
       .then(() => {
-				this.notyf.success("Utilisateur" + this.username + " créé !");
+				this.notyf.success("Utilisateur " + this.username + " créé !");
 				this.$router.push({ path: "/login" });
       })
       .catch(err => {

@@ -1,6 +1,8 @@
 <template>
 	<div id="app">
-		<div id="message">Bienvenue sur votre réseau social !</div>
+		<div class="container" style="text-align: left" id="message">
+			<p>Bienvenue sur votre réseau social !</p>
+		</div>
 		<router-view />
 	</div>
 </template>
@@ -31,8 +33,10 @@ export default {
 }
 
 #message {
-	position: absolute;
-	top: 500px; left: 40px;
+	position: sticky;
+	z-index: 100;
+	top: 600px;
 	color: white;
+	margin-left: 0;
 }
 </style>

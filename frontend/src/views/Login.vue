@@ -51,7 +51,12 @@ export default {
 		};
 	},
   created() {
-    this.notyf = new Notyf();
+		this.notyf = new Notyf({
+			position: {
+				x: 'center',
+				y: 'top'
+			}
+	});
   },
 	methods: {
 		// Connection et récupération des infos dans localStorage

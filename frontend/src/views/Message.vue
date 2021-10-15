@@ -1,42 +1,6 @@
 <template>  
     <HeaderMsg />
-
-	<!-- ==============================================
-	Affichage Bloc de publication Message
-	=============================================== -->
-
-    <section class="hero">
-        <div class="container">
-            <div class="row">	
-                <div class="col-lg-6 offset-lg-3">			
-                    <div class="cardbox shadow-lg bg-white">
-                        <div class="cardbox-heading">
-
-                            <form @submit.prevent="createMsg" aria-label="Nouveau message">        
-
-                                <div class="card-body w-100">
-                                    <h5 class="card-title">Votre message</h5>
-                                    <Textarea v-model="content" :autoResize="true" class="form-control" rows="4" minlength="5" required />
-                                    <div id="preview" style="display:block">
-                                        <img v-if="imagePreview" :src="imagePreview" id="preview" style="display:block" class="uploadImage" alt="Image Prévisualisée"/>
-                                    </div>         
-                                </div>
-
-                                <div class="d-flex py-3 justify-content-around">
-                                    <Button label="Choisir une image" @click="uploadFile" />
-                                        <input type="file" ref="fileUpload" @change="onFileSelected" class="d-none" accept="image/*" aria-label="Sélectionner un fichier">
-                                    <button type="submit" class="p-button p-component" aria-label="Publier le message">Publier</button>
-                                </div>
-
-                            </form>
-              
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
+    <PubliMsg />
 
 	<link href="https://fonts.googleapis.com/css?family=Rokkitt" rel="stylesheet"> 
 	<link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
@@ -47,89 +11,87 @@
     
     <div v-for="result in results" :key="result.id">
     
-    <section class="hero">
-        <div class="container">
-            <div class="row">	
+        <section class="hero">
+            <div class="container">
+                <div class="row">	
 
-                <div class="col-lg-6 offset-lg-3">
+                    <div class="col-lg-6 offset-lg-3">
 			
-                    <div class="cardbox shadow-lg bg-white">
+                        <div class="cardbox shadow-lg bg-white">
 	
-                        <div class="cardbox-heading">
-                            <!-- START dropdown-->
-                            <div class="dropdown float-right">
-                                <button class="btn btn-flat btn-flat-icon" type="button" data-toggle="dropdown" aria-expanded="false">
-                                    <em class="fa fa-ellipsis-h"></em>
-                                </button>
-                                <div class="dropdown-menu dropdown-scale dropdown-menu-right" role="menu" style="position: absolute; transform: translate3d(-136px, 28px, 0px); top: 0px; left: 0px; will-change: transform;">
-                                    <a v-if="userId == result.UserId || isAdmin == 'true'" v-on:click="deleteMsg(result.id)" class="dropdown-item">Supprimer le message</a>
-                                </div>
-                            </div><!--/ dropdown -->
-                            <div class="media m-0">
-                                <div class="d-flex mr-3">
-                                    <a href=""><img class="img-fluid rounded-circle" src="../assets/avatar-neutre.jpg" alt="User"></a>
-                                </div>
-                                <div class="media-body">
-                                    <h3 class="m-0">{{ result.message }}</h3>
-                                    <span><i class="icon ion-md-pin"></i>{{ result.User.name }}</span>
-                                    <span><i class="icon ion-md-time mx-2">{{ formatDateTime(result.createdAt) }}</i></span>
-                                </div>
-                            </div><!--/ media -->
-                        </div><!--/ cardbox-heading -->
-	
-                        <div class="cardbox-item m-2">
-                            <img class="img-fluid" :src="result.imageUrl" alt="Image">
-                        </div><!--/ cardbox-item -->
+                            <div class="cardbox-heading">
 
-                        <form @submit.prevent="displayComment(result.id)" aria-label="Nouveau message">        
-                            <button type="submit" class="p-button p-component" aria-label="Publier le message">Voir les commentaires</button>
-                        </form>
-
-                        <div v-for="comment in comments" :key="comment.id"><!-- Afficher Commentaires existants -->
-                            <div v-bind:toggleComment="toggleComment" v-if="toggleComment && result.id == comment.MessageId">
-
-                                <div class="media my-1 mx-3">
-
-                                    <div class="d-flex mr-3">
-                                        <a href=""><img class="img-fluid rounded-circle" src="../assets/avatar-neutre.jpg" alt="User"></a>
+                                <div class="dropdown float-right">
+                                    <button class="btn btn-flat btn-flat-icon" type="button" data-toggle="dropdown" aria-expanded="false">
+                                      <em class="fa fa-ellipsis-h"></em>
+                                    </button>
+                                     <div v-if="userId == result.UserId || isAdmin == 'true'" class="dropdown-menu dropdown-scale dropdown-menu-right" role="menu" style="position: absolute; transform: translate3d(-136px, 28px, 0px); top: 0px; left: 0px; will-change: transform;">
+                                        <a style="cursor: pointer" v-if="userId == result.UserId || isAdmin == 'true'" v-on:click="deleteMsg(result.id)" class="dropdown-item">Supprimer le message</a>
                                     </div>
-                                    <div class="media-body">
-                                        <h5 class="m-0">{{ comment.comment }}</h5>
-                                        <span><i class="icon ion-md-pin">{{ comment.User.name }}</i></span>
+                                </div><!--/ dropdown -->
+
+                                <div class="media m-0">
+                                    <div class="d-flex mr-3">
+                                        <img class="img-fluid rounded-circle" src="../assets/avatar-neutre.jpg" alt="User">
+                                    </div>
+                                    <div class="media-body col-4 border">
+                                        <h5 class="m-0" style="overflow-wrap: break-word;">{{ result.message }}</h5>
+                                        <span><i class="icon ion-md-pin"></i>{{ result.User.name }}</span>
                                         <span><i class="icon ion-md-time mx-2">{{ formatDateTime(result.createdAt) }}</i></span>
                                     </div>
-                                    <div class="dropdown float-right">
-                                        <button class="btn btn-flat btn-flat-icon" type="button" data-toggle="dropdown" aria-expanded="false">
-                                            <em class="fa fa-ellipsis-h"></em>
-                                        </button>
-                                        <div class="dropdown-menu dropdown-scale dropdown-menu-right" role="menu" style="position: absolute; transform: translate3d(-136px, 28px, 0px); top: 0px; left: 0px; will-change: transform;">
-                                            <a v-if="userId == result.UserId || isAdmin == 'true'" v-on:click="deleteComment(comment.id)" class="dropdown-item">Supprimer le commentaire</a>
+                                </div><!--/ media -->
+                            </div><!--/ cardbox-heading -->
+	
+                            <div class="cardbox-item m-2">
+                                <img class="img-fluid" :src="result.imageUrl" alt="Image">
+                            </div><!--/ cardbox-item -->
+
+                            <form @submit.prevent="displayComment(result.id)" aria-label="Nouveau commentaire">        
+                                <button type="submit" class="p-button p-component" aria-label="Publier le message">Voir les commentaires</button>
+                            </form>
+
+                            <div v-for="comment in comments" :key="comment.id"><!-- Afficher Commentaires existants -->
+                                <div v-bind:toggleComment="toggleComment" v-if="toggleComment && result.id == comment.MessageId">
+
+                                    <div class="media my-1 mx-3">
+
+                                        <div class="d-flex mr-3">
+                                            <img class="img-fluid rounded-circle" src="../assets/avatar-neutre.jpg" alt="User">
                                         </div>
-                                    </div><!--/ dropdown -->
+                                        <div class="media-body col-4 border">
+                                            <h5 class="m-0" style="overflow-wrap: break-word;">{{ comment.comment }}</h5>
+                                            <span><i class="icon ion-md-pin">{{ comment.User.name }}</i></span>
+                                            <span><i class="icon ion-md-time mx-2">{{ formatDateTime(comment.createdAt) }}</i></span>
+                                        </div>
+                                        <div class="dropdown float-right">
+                                            <button class="btn btn-flat btn-flat-icon" type="button" data-toggle="dropdown" aria-expanded="false">
+                                                <em class="fa fa-ellipsis-h"></em>
+                                            </button>
+                                            <div v-if="userId == comment.UserId || isAdmin == 'true'" class="dropdown-menu dropdown-scale dropdown-menu-right" role="menu" style="position: absolute; transform: translate3d(-136px, 28px, 0px); top: 0px; left: 0px; will-change: transform;">
+                                                <a style="cursor: pointer" v-if="userId == comment.UserId || isAdmin == 'true'" v-on:click="deleteComment(comment.id)" class="dropdown-item">Supprimer le commentaire</a>
+                                            </div>
+                                        </div><!--/ dropdown -->
 
-                                </div><!--/ Commentaires existants -->
-                            </div>
-                        </div>
-
-                        <form @submit.prevent="createComment(result.id)" aria-label="Nouveau commentaire"> 
-
-                            <div class="card-body w-80">
-                                <Textarea v-model="newComment" :autoResize="true" class="form-control m-2" rows="3" placeholder="Votre commentaire" minlength="5" required />
-                                <div id="preview" style="display:block">
-                                    <img v-if="imagePreview" :src="imagePreview" id="preview" style="display:block"  alt="Prévisualisation de l'image ajoutée au message"/>
+                                    </div><!--/ Commentaires existants -->
                                 </div>
-                                <button type="submit" class="p-button p-component" aria-label="Publier le message">Publier</button>       
                             </div>
 
-                        </form>
-				
-                    </div><!--/ cardbox -->
+                            <form @submit.prevent="createComment(result.id)" aria-label="Nouveau commentaire"> 
 
-                </div><!--/ col-lg-6 -->	
+                                <div class="card-body w-80">
+                                    <Textarea v-model="newComment" :autoResize="true" class="form-control m-2" rows="3" placeholder="Votre commentaire" minlength="5" maxlength="255" required />
+                                    <button type="submit" class="p-button p-component" aria-label="Publier le message">Publier</button>       
+                                </div>
+
+                            </form>
+				
+                        </div><!--/ cardbox -->
+
+                    </div><!--/ col-lg-6 -->	
 			
-            </div><!--/ row -->
-        </div><!--/ container -->
-    </section>
+                </div><!--/ row -->
+            </div><!--/ container -->
+        </section>
     </div>
 
     <router-view/>
@@ -141,6 +103,7 @@
 <script>  
 import axios from 'axios'
 import HeaderMsg from '../components/HeaderMsg.vue'
+import PubliMsg from '../components/PubliMsg.vue'
 import Textarea from 'primevue/textarea';
 import moment from 'moment'
 import { Notyf } from "notyf";
@@ -150,6 +113,7 @@ export default {
     name: 'Message',
     components: {
         HeaderMsg,
+        PubliMsg,
         Textarea,
     },
     data() {
@@ -160,7 +124,6 @@ export default {
             results: [],
             result: '',
             imageUrl: '',
-            imagePreview: null,
             content: '',
             toggleComment: false,
             comments: [],
@@ -170,39 +133,16 @@ export default {
 
     created() {
         this.displayMsg();
-        this.notyf = new Notyf();
+        this.notyf = new Notyf({
+            position: {
+                x: 'center',
+                y: 'top'
+			}
+		});
+
     },
 
     methods: {
-
-        uploadFile() {
-            this.$refs.fileUpload.click()
-        },
-
-        onFileSelected(event) {
-            this.imagePost = event.target.files[0];
-            this.imagePreview = URL.createObjectURL(this.imagePost);
-        }, 
-
-        createMsg() {
-            const formData = new FormData();
-            formData.append("content", this.content);
-            formData.append("image", this.imagePost);
-
-            axios.post('http://localhost:3000/api/message', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                    'Authorization': 'Bearer ' + localStorage.getItem('token')
-                }
-            })
-            .then(() => {
-                window.location.reload()
-            })
-            .catch(err => {
-                this.notyf.error("Erreur Create " + err.response.status + " " + err.response.statusText);
-				window.location.reload();
-            })
-        },
 
         // Permet d'afficher tous les messages
         displayMsg() {
@@ -397,6 +337,7 @@ text-align: center;
   -ms-flex: 1;
   flex: 1;
   padding: .4rem !important;
+  width: 80%;
 }
 .media-body p{
   font-family: 'Rokkitt', serif;	
@@ -562,14 +503,6 @@ text-align: center;
  font-family: 'Rokkitt', serif;
  font-size: 16px;
  color: #8d8d8d;
-}
-
-.uploadImage {
-    max-width: 50rem;
-    width: 90%;
-    height: 274px;
-    margin: 1rem auto;
-    object-fit: cover;
 }
 
 

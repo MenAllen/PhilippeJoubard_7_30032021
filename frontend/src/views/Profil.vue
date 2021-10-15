@@ -10,46 +10,43 @@
     <div class="container">
       <div class="row blog">
         <div class="col-md-12">
-          <div id="blogCarousel" class="carousel slide container-blog" data-ride="carousel">
-            <ol class="carousel-indicators">
-              <li data-target="#blogCarousel" data-slide-to="0" class="active"></li>
-              <li data-target="#blogCarousel" data-slide-to="1"></li>
-            </ol>
 
-            <!-- Carousel items -->
-            <div class="carousel-inner">
-              <div class="carousel-item active">
-                <div class="row justify-content-center">
+          <div class="carousel-item active">
+            <div class="row justify-content-center">
 
-                  <div class="col-md-4" >
-                    <div class="item-box-blog">
-                      <div class="item-box-blog-image">
-                        <!--Date-->
-                        <div class="item-box-blog-date bg-blue-ui white"> <span class="mon">{{ user.name }}</span> </div>
-                        <!--Image-->
-                        <figure> <img alt="" src="../assets/avatar-neutre.jpg"> </figure>
-                      </div>
-                      <div class="item-box-blog-body">
-                        <!--Heading-->
-                        <div class="item-box-blog-heading">
-                            <h5 class="text-light">{{ user.email }}</h5>
-														<h6 class="text-light">{{ formatDateTime(user.createdAt) }}</h6>
-                        </div>
-                        <!--Data-->
-                        <div class="item-box-blog-data" style="padding: px 15px;">
-                          <p v-if="isAdmin == 'true'">Administrateur</p>
-                        </div>
-                        <div class="mt"> <a data-bs-toggle="modal" data-bs-target="#staticBackdrop2" href="#" tabindex="0" class="btn bg-blue-ui white read">Supprimer le profil</a> </div>
-                        <!--Read More Button-->
-                      </div>
-                    </div>
+              <div class="col-md-4" >
+                <div class="item-box-blog">
+                  <div class="item-box-blog-image">
+                    <!--Date-->
+                    <div class="item-box-blog-date bg-blue-ui white">
+                      <span class="mon">{{ user.name }}</span>
+                     </div>
+                    <!--Image-->
+                    <figure>
+                      <img alt="" src="../assets/avatar-neutre.jpg">
+                    </figure>
                   </div>
+                  <div class="item-box-blog-body">
+                    <!--Heading-->
+                    <div class="item-box-blog-heading">
+                      <h5 class="text-light">{{ user.email }}</h5>
+                      <h6 class="text-light">{{ formatDateTime(user.createdAt) }}</h6>
+                    </div>
+                    <!--Data-->
+                    <div class="item-box-blog-data" style="padding: px 15px;">
+                      <p v-if="isAdmin == 'true'">Administrateur</p>
+                    </div>
+                    <div class="mt"> 
+                      <a data-bs-toggle="modal" data-bs-target="#staticBackdrop2" href="#" tabindex="0" class="btn bg-blue-ui white read">Supprimer le profil</a>
+                    </div>
+                    <!--Read More Button-->
+                  </div>
+                </div>
+              </div>
 
-								</div>
-							</div>
-						</div><!--carroussel inner -->
-
+						</div>
 					</div>
+
 				</div>
 			</div>
 		</div>
@@ -100,7 +97,12 @@ export default {
 
   created() {
     this.displayProfil();
-    this.notyf = new Notyf();
+    this.notyf = new Notyf({
+			position: {
+				x: 'center',
+				y: 'top'
+			}
+		});
 	},
 
 	methods: {
