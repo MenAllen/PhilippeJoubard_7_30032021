@@ -52,10 +52,9 @@ https://github.com/MenAllen/PhilippeJoubard_7_30032021.git
 	The application is based on 3 main tables : User, Message, Comment
 		The User table includes name, email and password, isAdmin for each employee
 		The Message table includes the text and url of the picture submitted by an employee
-		The Comment table includes comments done on a specifi Message by Employees
+		The Comment table includes comments done on a specific message by Employees
 	Any User is allowed to create an account, publish and comment message.
 	Any User is allowed to delete his own account, thus deleting all published messages and comments
-	Any User can list Users created
 	Any User can get all the messages & comments published by employees
 	Admin User is declared admin with manual SQL request
 	Admin User is allowed to delete any message & comment
