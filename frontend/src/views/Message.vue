@@ -154,7 +154,6 @@ export default {
             })
             .then(response => { 
                 this.results= response.data.results;
-                console.log(response.data.results);
             })
             .catch(err => {
                 this.notyf.error("Erreur Display " + err.response.status + " " + err.response.statusText);

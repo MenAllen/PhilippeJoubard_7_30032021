@@ -135,7 +135,6 @@ export default {
       })
       .then(response => {
         this.results= response.data.results;
-        console.log(response.data.results);
       })
       .catch(err => {
         this.notyf.error("Erreur Display " + err.response.status + " " + err.response.statusText);
@@ -161,13 +160,13 @@ export default {
         }
       })
       .then(() => {
-        alert('Votre compte a bien été supprimé')
+        this.notyf.success("Votre profil a été supprimé");
         localStorage.clear();
         this.$router.push('/');
       })
 
       .catch(err => {
-        this.notyf.error("Erreur Display " + err.response.status + " " + err.response.statusText);
+        this.notyf.error("Erreur Delete " + err.response.status + " " + err.response.statusText);
 				window.location.reload();
       })
     }		
