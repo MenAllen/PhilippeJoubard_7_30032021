@@ -56,6 +56,7 @@ https://github.com/MenAllen/PhilippeJoubard_7_30032021.git
 	Any User is allowed to create an account, publish and comment message.
 	Any User is allowed to delete his own account, thus deleting all published messages and comments
 	Any User can get all the messages & comments published by employees
+	Any User can delete his own messages or comments (using grey icon in the message bloc)
 	Admin User is declared admin with manual SQL request
-	Admin User is allowed to delete any message & comment
+	Admin User is allowed to delete any message & comment (using grey icon in the message bloc)
  
