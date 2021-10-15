@@ -54,7 +54,7 @@ https://github.com/MenAllen/PhilippeJoubard_7_30032021.git
 		The Message table includes the text and url of the picture submitted by an employee
 		The Comment table includes comments done on a specific message by Employees
 	Any User is allowed to create an account, publish and comment message.
-	Any User is allowed to delete his own account, thus deleting all published messages and comments
+	Any User is allowed to delete his own account
 	Any User can get all the messages & comments published by employees
 	Any User can delete his own messages or comments (using grey icon in the message bloc)
 	Admin User is declared admin with manual SQL request

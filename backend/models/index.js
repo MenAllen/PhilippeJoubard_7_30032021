@@ -39,8 +39,12 @@ db.comments = require("./comment.js")(sequelize, Sequelize);
 db.users.hasMany(db.messages, { onDelete: "CASCADE", hooks: true });
 db.messages.belongsTo(db.users, { onDelete: "CASCADE", hooks: true });
 
+db.messages.hasMany(db.comments, { onDelete: "CASCADE", hooks: true });
+db.comments.belongsTo(db.messages);
+
 db.users.hasMany(db.comments);
 db.comments.belongsTo(db.users);
-db.comments.belongsTo(db.messages);
+
+//db.comments.hasOne(db.comments);
 
 module.exports = db;
